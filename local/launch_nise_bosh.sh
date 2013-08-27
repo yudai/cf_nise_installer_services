@@ -9,7 +9,5 @@ NISE_IP_ADDRESS=${NISE_IP_ADDRESS} ./common/launch_nsie_bosh.sh
     cd nise_bosh
     bundle install
     # Old spec format
-    sudo env PATH=$PATH bundle exec ./bin/nise-bosh -y ../cf-release ../manifests/deploy.yml micro
-    # New spec format, keeping the  monit files installed in the previous run
-    sudo env PATH=$PATH bundle exec ./bin/nise-bosh --keep-monit-files -y ../cf-release ../manifests/deploy.yml micro_ng
+    sudo env PATH=$PATH bundle exec ./bin/nise-bosh -y ../cf-services-contrib-release ../manifests/deploy.yml micro
 )
