@@ -6,16 +6,30 @@ deployment: cf-services-contrib-release
 jobs:
 - name: micro
   template:
-  - postgresql_gateway_ng
-  - postgresql_node_ng
+    - elasticsearch_gateway
+    - mongodb_gateway
+    - memcached_gateway
+    - postgresql_gateway_ng
+    - redis_gateway
+    - rabbit_gateway
+    - vblob_gateway
+
+    - mongodb_node_ng
+    - memcached_node_ng
+    - vblob_node_ng
+    - elasticsearch_node
+    - postgresql_node_ng 
+    - redis_node_ng
+    - rabbit_node_ng
   properties:
-    postgresql_node:
-      plan: default
     uaa_client_id: "cf"
     uaa_endpoint: http://uaa.192.168.10.10.xip.io
     uaa_client_auth_credentials:
       username: services
       password: c1oudc0w
+    plan: default
+    postgresql_node:
+        plan: default
 
 properties:
   networks:
@@ -33,6 +47,57 @@ properties:
     authorization_timeout: 5
 
   service_plans:
+    mongodb:
+      default:
+        description: "Developer, shared VM, 250MB storage, 10 connections"
+        free: true
+        job_management:
+          high_water: 230
+          low_water: 20
+        configuration:
+          capacity: 125
+          max_clients: 10
+          quota_files: 4
+          quota_data_size: 240
+          enable_journaling: true
+          backup:
+            enable: true
+          lifecycle:
+            enable: true
+            serialization: enable
+            snapshot:
+              quota: 1
+
+    memcached:
+      default:
+        description: "Developer"
+        free: true
+        job_management:
+          high_water: 230
+          low_water: 20
+        configuration:
+          capacity: 125
+
+    vblob:
+      default:
+        description: "Developer"
+        free: true
+        job_management:
+          high_water: 230
+          low_water: 20
+        configuration:
+          capacity: 125
+
+    elasticsearch:
+      default:
+        description: "Developer"
+        free: true
+        job_management:
+          high_water: 230
+          low_water: 20
+        configuration:
+          capacity: 125
+
     postgresql:
       default:
         description: "Developer, 250MB storage, 10 connections"
@@ -54,10 +119,103 @@ properties:
             snapshot:
               quota: 1
 
+    redis:
+      default:
+        description: "Developer, 250MB storage, 10 connections"
+        free: true
+        job_management:
+          high_water: 230
+          low_water: 20
+        configuration:
+          capacity: 125
+          max_clients: 10
+          quota_files: 4
+          quota_data_size: 240
+          enable_journaling: true
+          backup:
+            enable: false
+          lifecycle:
+            enable: false
+            serialization: enable
+            snapshot:
+              quota: 1
+
+
+    rabbit:
+      default:
+        description: "Developer, 250MB storage, 10 connections"
+        free: true
+        job_management:
+          high_water: 230
+          low_water: 20
+        configuration:
+          capacity: 125
+          max_clients: 10
+          quota_files: 4
+          quota_data_size: 240
+          enable_journaling: true
+          backup:
+            enable: false
+          lifecycle:
+            enable: false
+            serialization: enable
+            snapshot:
+              quota: 1
+
+
+  mongodb_gateway:
+    ip_route: 192.168.10.11
+    token: MONGODB_SERVICE_TOKEN # CHANGE - the token you use later with `cf create-service-auth-token`
+    default_plan: default
+    supported_versions: ["2.2"]
+    version_aliases:
+      current: "2.2"
+    cc_api_version: v2
+  mongodb_node:
+    ip_route: 192.168.10.11
+    supported_versions: ["2.2"]
+    default_version: "2.2"
+    max_tmp: 900
+
+  memcached_gateway:
+    ip_route: 192.168.10.11
+    token: MEMCACHED_SERVICE_TOKEN # CHANGE - the token you use later with `cf create-service-auth-token`
+    supported_versions: ["1.4"]
+    version_aliases:
+      current: "1.4"
+    cc_api_version: v2
+  memcached_node:
+    ip_route: 192.168.10.11
+    supported_versions: ["1.4"]
+    default_version: "1.4"
+
+  vblob_gateway:
+    ip_route: 192.168.10.11
+    token: VBLOB_SERVICE_TOKEN # CHANGE - the token you use later with `cf create-service-auth-token`
+    supported_versions: ["0.51"]
+    version_aliases:
+      current: "0.51"
+    cc_api_version: v2
+  vblob_node:
+    ip_route: 192.168.10.11
+    supported_versions: ["0.51"]
+    default_version: "0.51"
+
+  elasticsearch_gateway:
+    ip_route: 192.168.10.11
+    token: ELASTICSEARCH_SERVICE_TOKEN # CHANGE - the token you use later with `cf create-service-auth-token`
+    supported_versions: ["0.20"]
+    version_aliases:
+      current: "0.20"
+    cc_api_version: v2
+  elasticsearch_node:
+    ip_route: 192.168.10.11
+    supported_versions: ["0.20"]
+    default_version: "0.20"
 
   postgresql_gateway:
     ip_route: 192.168.10.11
-    token: POSTGRESQL_SERVICE_TOKEN
+    token: POSTGRESQL_SERVICE_TOKEN # CHANGE - the token you use later with `cf create-service-auth-token`
     default_plan: default
     supported_versions: ["9.2"]
     version_aliases:
@@ -68,4 +226,32 @@ properties:
     supported_versions: ["9.2"]
     default_version: "9.2"
     max_tmp: 900
-    password: c1oudc0w
+    password: POSTGRESQL_ROOT_PASSWORD # CHANGE
+
+  redis_gateway:
+    ip_route: 192.168.10.11
+    token: REDIS_SERVICE_TOKEN # CHANGE - the token you use later with `cf create-service-auth-token`
+    default_plan: default
+    supported_versions: ["2.6"]
+    version_aliases:
+      current: "2.6"
+    cc_api_version: v2
+  redis_node:
+    ip_route: 192.168.10.11
+    supported_versions: ["2.6"]
+    default_version: "2.6"
+    max_tmp: 900
+
+  rabbit_gateway:
+    ip_route: 192.168.10.11
+    token: RABBIT_SERVICE_TOKEN # CHANGE - the token you use later with `cf create-service-auth-token`
+    default_plan: "default"
+    supported_versions: ["3.0"]
+    version_aliases:
+      current: "3.0"
+    cc_api_version: v2
+  rabbit_node:
+    ip_route: 192.168.10.11
+    supported_versions: ["3.0"]
+    default_version: "3.0"
+    max_tmp: 900
